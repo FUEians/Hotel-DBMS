@@ -24,13 +24,14 @@ CREATE TABLE Hotel (
 
 -- Table: Hotel_Location
 CREATE TABLE Hotel_Location (
-     Hotel_ID INT NOT NULL,
+    Hotel_ID INT NOT NULL,
     state VARCHAR(50),
     city VARCHAR(50),
     street VARCHAR(100),
-	PRIMARY KEY (Hotel_id, city, street),
-    FOREIGN KEY ( Hotel_ID) REFERENCES hotel( Hotel_ID)
+    PRIMARY KEY (Hotel_ID),
+    FOREIGN KEY (Hotel_ID) REFERENCES hotel(Hotel_ID)
 );
+
 -- Table: Hotel_ContactNumber
 CREATE TABLE Hotel_ContactNumber (
     Contact_number VARCHAR(15),
@@ -55,6 +56,26 @@ CREATE TABLE Employee (
     FOREIGN KEY (Manager_ID) REFERENCES Employee(Employee_ID)
 );
 
+-- Table: Guest
+CREATE TABLE Guest (
+    Guest_ID INT PRIMARY KEY,
+    Email VARCHAR(100) unique ,
+    Phone_number VARCHAR(15),
+    First_name VARCHAR(50),
+    Middle_name VARCHAR(50),
+    Last_name VARCHAR(50)
+);
+
+-- Table: Payment
+CREATE TABLE Payment (
+    Payment_code INT PRIMARY KEY,
+    Payment_date DATE,
+    Method VARCHAR(50),
+    Guest_ID INT,
+    Payment_Status VARCHAR(50) CHECK (Payment_Status IN ('Completed', 'Pending', 'Failed')),
+    FOREIGN KEY (Guest_ID) REFERENCES Guest(Guest_ID)
+);
+
 -- Table: Service
 CREATE TABLE Service (
     Service_number INT PRIMARY KEY,
@@ -70,16 +91,6 @@ CREATE TABLE Employee_Provides_Service (
     PRIMARY KEY (Service_number, Employee_ID),
     FOREIGN KEY (Service_number) REFERENCES Service(Service_number),
     FOREIGN KEY (Employee_ID) REFERENCES Employee(Employee_ID)
-);
-
--- Table: Guest
-CREATE TABLE Guest (
-    Guest_ID INT PRIMARY KEY,
-    Email VARCHAR(100) unique ,
-    Phone_number VARCHAR(15),
-    First_name VARCHAR(50),
-    Middle_name VARCHAR(50),
-    Last_name VARCHAR(50)
 );
 
 -- Table: Guest_Receives_Services
@@ -101,15 +112,6 @@ CREATE TABLE LoyaltyCard (
     FOREIGN KEY (Guest_ID) REFERENCES Guest(Guest_ID)
 );
 
--- Table: Payment
-CREATE TABLE Payment (
-    Payment_code INT PRIMARY KEY,
-    Payment_date DATE,
-    Method VARCHAR(50),
-    Guest_ID INT,
-    Payment_Status VARCHAR(50) CHECK (Payment_Status IN ('Completed', 'Pending', 'Failed')),
-    FOREIGN KEY (Guest_ID) REFERENCES Guest(Guest_ID)
-);
 
 -- Table: Room
 CREATE TABLE Room (
@@ -144,11 +146,60 @@ CREATE TABLE Reservation (
 INSERT INTO Hotel VALUES
 (1, 'Golden Bloom Hotel - New York', 'nyc@goldenbloom.com', 4.7),
 (2, 'Golden Bloom Hotel - Los Angeles', 'la@goldenbloom.com', 4.5),
-(3, 'Golden Bloom Hotel - Chicago', 'chicago@goldenbloom.com', 4.6),
-(4, 'Golden Bloom Hotel - Miami', 'miami@goldenbloom.com', 4.4),
-(5, 'Golden Bloom Hotel - Dallas', 'dallas@goldenbloom.com', 4.3),
-(6, 'Golden Bloom Hotel - Seattle', 'seattle@goldenbloom.com', 4.5),
-(7, 'Golden Bloom Hotel - Denver', 'denver@goldenbloom.com', 4.6),
-(8, 'Golden Bloom Hotel - Boston', 'boston@goldenbloom.com', 4.7),
-(9, 'Golden Bloom Hotel - Atlanta', 'atlanta@goldenbloom.com', 4.4),
-(10, 'Golden Bloom Hotel - San Francisco', 'sf@goldenbloom.com', 4.6);
+(3, 'Golden Bloom Hotel - Chicago', 'chicago@goldenbloom.com', 4.6);
+
+INSERT INTO Hotel_Location VALUES
+(1, 'New York', 'New York City', '123 Luxury Lane'),
+(2, 'California', 'Los Angeles', '456 Ocean Ave'),
+(3, 'Illinois', 'Chicago', '789 River Road');
+
+INSERT INTO Hotel_ContactNumber VALUES
+('+1234567890', 1),
+('+1234567891', 2),
+('+1234567892', 3);
+
+INSERT INTO Employee VALUES
+(101, 'john.doe@example.com', '+1987654321', 'Morning', 'Front Desk Manager', 50000.00, 1, 'John', 'Doe', NULL),
+(102, 'jane.smith@example.com', '+1987654322', 'Afternoon', 'Receptionist', 35000.00, 2, 'Jane', 'Smith', 101),
+(103, 'alice.johnson@example.com', '+1987654323', 'Night', 'Security Officer', 38000.00, 3, 'Alice', 'Johnson', 101);
+
+INSERT INTO Guest VALUES
+(2001, 'anna.smith@example.com', '+1122334455', 'Anna', 'Marie', 'Smith'),
+(2002, 'thomas.jones@example.com', '+1122334456', 'Thomas', 'A.', 'Jones'),
+(2003, 'olivia.baker@example.com', '+1122334457', 'Olivia', '', 'Baker');
+
+INSERT INTO Payment VALUES
+(3001, '2025-04-01', 'Credit Card', 2001, 'Completed'),
+(3002, '2025-04-02', 'Debit Card', 2002, 'Pending'),
+(3003, '2025-04-03', 'PayPal', 2003, 'Completed');
+
+INSERT INTO Service VALUES
+(5001, 25.00, 'Room Service - Breakfast', 3001),
+(5002, 15.00, 'Room Service - Lunch', 3002),
+(5003, 50.00, 'Spa Package', 3003);
+
+INSERT INTO Employee_Provides_Service  VALUES
+(5001, 101),
+(5002, 102),
+(5003, 103);
+
+INSERT INTO Guest_Receives_Services VALUES
+(5001, 2001),
+(5002, 2002),
+(5003, 2003);
+
+INSERT INTO LoyaltyCard VALUES
+(9001, '2024-01-15', '2025-01-15', 2001, 150),
+(9002, '2024-02-10', '2025-02-10', 2002, 200),
+(9003, '2024-03-05', '2025-03-05', 2003, 100);
+
+INSERT INTO Room VALUES
+(101, 'Standard', 'Good', 2, 150.00, 1),
+(102, 'Deluxe', 'Excellent', 2, 200.00, 2),
+(103, 'Suite', 'Excellent', 4, 300.00, 3);
+
+INSERT INTO Reservation VALUES
+(4001, 'Confirmed', '2025-04-05', '2025-04-10', '14:00:00', '12:00:00', 'Non-smoking room', 3001, 2001, 101, 1),
+(4002, 'Cancelled', '2025-04-06', '2025-04-11', '15:00:00', '11:00:00', 'King bed required', 3002, 2002, 102, 2),
+(4003, 'Pending', '2025-04-07', '2025-04-12', '13:00:00', '10:00:00', 'Near elevator', 3003, 2003, 103, 3);
+
